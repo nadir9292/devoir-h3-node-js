@@ -1,0 +1,24 @@
+{
+  "type": "module",
+  "name": "universal_mockup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "knex": "^2.4.2",
+    "mongoose": "^7.0.0",
+    "nodemon": "^2.0.21",
+    "objection": "^3.0.1",
+    "pg": "^8.9.0"
+  }
+}
