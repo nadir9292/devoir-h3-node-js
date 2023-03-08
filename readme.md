@@ -16,3 +16,9 @@ SECURITY_NUMBERBYTES=32
 SECURITY_FORMATHASH=sha512
 SECURITY_SECRET=h3hitemadevoir
 ```
+
+# Knex migration for table postgresql
+
+```
+ - `npx knex migrate:latest`
+```

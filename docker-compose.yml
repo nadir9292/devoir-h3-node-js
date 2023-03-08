@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/universaldb
+    depends_on:
+      - db
+    networks:
+      - my-network
+
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=universaldb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+networks:
+  my-network:
+
+volumes:
+  db-data:
