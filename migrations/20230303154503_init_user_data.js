@@ -7,8 +7,8 @@ export const up = async (knex) => {
     mail: "admin",
     pseudo: "admin",
     role: 2,
-    passwordHash: "dpozadjzadjdfsq",
-    passwordSalt: "oiazfnugtbgdjvwd",
+    passwordHash: "admin",
+    passwordSalt: "admin",
   })
 }
 
@@ -17,5 +17,5 @@ export const up = async (knex) => {
  * @returns { Promise<void> }
  */
 export const down = async (knex) => {
-  return knex.raw("TRUNCATE TABLE user")
+  await knex("user").truncate()
 }

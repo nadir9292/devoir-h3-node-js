@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 export const up = (knex) => {
-  return knex.schema.createTable("user", function (table) {
+  return knex.schema.createTable("user", (table) => {
     table.increments("id")
     table.string("mail").unique()
     table.string("pseudo").unique()
@@ -11,6 +11,7 @@ export const up = (knex) => {
     table.timestamp("created_at").defaultTo(knex.fn.now())
     table.text("passwordHash")
     table.text("passwordSalt")
+    table.boolean("isBanned").defaultTo(false)
   })
 }
 

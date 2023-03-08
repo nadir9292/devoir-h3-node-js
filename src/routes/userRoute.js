@@ -7,7 +7,13 @@ import auth from "../middlewares/auth.js"
 const userRoute = ({ app }) => {
   //GET request
   app.get("/users", async (req, res) => {
-    const users = await UserModel.query()
+    const users = await UserModel.query().select(
+      "id",
+      "pseudo",
+      "mail",
+      "role",
+      "created_at"
+    )
     res.send(users)
   })
 
@@ -18,7 +24,7 @@ const userRoute = ({ app }) => {
     } = req
 
     if (Number(userId) != sessionUserId) {
-      return res.status(403).send({ error: "acces denied !" })
+      return res.status(403).send({ error: "access denied !" })
     }
 
     const user = await UserModel.query()
@@ -31,16 +37,11 @@ const userRoute = ({ app }) => {
   //CREATTE USER
   app.post("/:adminId/create-user", async (req, res) => {
     const {
-      body: { mail, pseudo, password },
+      body: { mail, pseudo, password, role },
       params: { adminId },
-      session: { userId: sessionUserId },
     } = req
 
     try {
-      if (Number(adminId) != sessionUserId) {
-        return res.status(403).send({ error: "acces denied !" })
-      }
-
       const checkAdmin = await UserModel.findUserByIdAndRole(adminId, 2) // role = 2 = "admin"
 
       if (!checkAdmin) {
@@ -55,15 +56,15 @@ const userRoute = ({ app }) => {
 
       const [passwordHash, passwordSalt] = hashPassword(password)
 
-      const insertedUser = await UserModel.query().insertAndFetch({
+      await UserModel.query().insertAndFetch({
         mail,
         pseudo,
-        role: 1,
+        role,
         passwordHash,
         passwordSalt,
       })
 
-      res.send(insertedUser)
+      res.send("User created successfully")
     } catch (err) {
       return res.status(401).send({ error: "Error : " + err })
     }
@@ -80,7 +81,7 @@ const userRoute = ({ app }) => {
 
       const [passwordHash, passwordSalt] = hashPassword(password)
 
-      const insertedUser = await UserModel.query().insertAndFetch({
+      await UserModel.query().insertAndFetch({
         mail,
         pseudo,
         role: 0,
@@ -88,7 +89,7 @@ const userRoute = ({ app }) => {
         passwordSalt,
       })
 
-      res.send(insertedUser)
+      res.status(200).send("User created successfully")
     } catch (err) {
       return res.status(401).send({ error: "Error : " + err })
     }
@@ -120,20 +121,45 @@ const userRoute = ({ app }) => {
     }
   })
 
-  //DELETE USER
-  app.delete("/users/:userId", async (req, res) => {
+  app.post("/users/:adminId/ban/:userId", async (req, res) => {
     try {
       const {
-        params: { userId },
+        params: { adminId, userId },
       } = req
 
-      const user = UserModel.findUserById(Number(userId))
+      const checkAdmin = await UserModel.findUserByIdAndRole(Number(adminId), 2) // role = 2 = "admin"
+
+      if (!checkAdmin) {
+        return res.status(403).send({ error: "forbidden" })
+      }
+
+      const user = await UserModel.query().patchAndFetchById(Number(userId), {
+        isBanned: true,
+      })
+      res.status(200).send("User (id: " + Number(userId) + ") has been banned")
+    } catch (err) {
+      return res.status(500).send("error: " + err)
+    }
+  })
+
+  //DELETE USER
+  app.delete("/:adminId/users/:userId", async (req, res) => {
+    try {
+      const {
+        params: { userId, adminId },
+      } = req
+
+      const checkAdmin = await UserModel.findUserByIdAndRole(adminId, 2) // role = 2 = "admin"
+
+      if (!checkAdmin) {
+        return res.status(403).send({ error: "forbidden" })
+      }
+
+      const user = await UserModel.query().deleteById(Number(userId))
 
       if (!user) {
         res.status(403).send("User not found")
       }
-
-      user.delete()
 
       return res.send()
     } catch (err) {

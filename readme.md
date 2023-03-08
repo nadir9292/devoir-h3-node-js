@@ -4,7 +4,7 @@
 - manager = 1
 - admin = 2
 
-# Environment variables
+# Environment variables :
 
 ```
 DB_CLIENT=pg
